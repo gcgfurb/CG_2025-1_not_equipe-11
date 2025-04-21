@@ -47,7 +47,7 @@ namespace gcgcg
     private bool mouseMovtoPrimeiro = true;
     private Ponto4D mouseMovtoUltimo;
 
-    private SplineBezier splineBezier;
+    private Spline spline;
 
     public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
       : base(gameWindowSettings, nativeWindowSettings)
@@ -85,7 +85,7 @@ namespace gcgcg
 #endif
 
       #region CG_N2_3
-      splineBezier = new SplineBezier(mundo, ref rotuloAtual);
+      spline = new Spline(mundo, ref rotuloAtual);
       #endregion
 
     }
@@ -123,25 +123,25 @@ namespace gcgcg
         Close();
 
       if (estadoTeclado.IsKeyPressed(Keys.Space))
-        splineBezier.AtualizarSpline(new Ponto4D(), true);
+        spline.AtualizarSpline(new Ponto4D(), true);
 
       if (estadoTeclado.IsKeyPressed(Keys.C) || estadoTeclado.IsKeyPressed(Keys.Up))
-        splineBezier.AtualizarSpline(new Ponto4D(0, +0.05), false);
+        spline.AtualizarSpline(new Ponto4D(0, +0.05), false);
 
       if (estadoTeclado.IsKeyPressed(Keys.B) || estadoTeclado.IsKeyPressed(Keys.Down))
-        splineBezier.AtualizarSpline(new Ponto4D(0, -0.05), false);
+        spline.AtualizarSpline(new Ponto4D(0, -0.05), false);
 
       if (estadoTeclado.IsKeyPressed(Keys.E) || estadoTeclado.IsKeyPressed(Keys.Left))
-        splineBezier.AtualizarSpline(new Ponto4D(-0.05, 0), false);
+        spline.AtualizarSpline(new Ponto4D(-0.05, 0), false);
 
       if (estadoTeclado.IsKeyPressed(Keys.D) || estadoTeclado.IsKeyPressed(Keys.Right))
-        splineBezier.AtualizarSpline(new Ponto4D(+0.05, 0), false);
+        spline.AtualizarSpline(new Ponto4D(+0.05, 0), false);
 
       if (estadoTeclado.IsKeyPressed(Keys.Equal))
-        splineBezier.SplineQtdPto(1);
+        spline.SplineQtdPto(1);
 
       if (estadoTeclado.IsKeyPressed(Keys.Comma) || estadoTeclado.IsKeyPressed(Keys.Minus))
-        splineBezier.SplineQtdPto(-1);
+        spline.SplineQtdPto(-1);
       #endregion
 
       #region  Mouse

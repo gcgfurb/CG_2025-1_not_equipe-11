@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace gcgcg
 {
-  internal class SplineBezier : Objeto
+  internal class Spline : Objeto
   {
     private int ptoSelecionado = 0;
     private char rotuloAtual;
@@ -15,7 +15,7 @@ namespace gcgcg
     private Poligono poligono;
     private Ponto[] ptos = new Ponto[4];
 
-    public SplineBezier(Objeto _paiRef, ref char _rotulo) : base(_paiRef, ref _rotulo)
+    public Spline(Objeto _paiRef, ref char _rotulo) : base(_paiRef, ref _rotulo)
     {
       rotuloAtual = _rotulo;
       PrimitivaTipo = PrimitiveType.LineStrip;
