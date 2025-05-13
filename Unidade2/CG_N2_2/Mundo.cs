@@ -179,7 +179,6 @@ namespace gcgcg
         else
           Console.WriteLine("objetoSelecionado: MUNDO \n__________________________________\n");
       }
-
       if (estadoTeclado.IsKeyPressed(Keys.C) && objetoSelecionado != null)
       {
         objetoSelecionado.ShaderObjeto = _shaderCiano;
@@ -193,7 +192,6 @@ namespace gcgcg
           objetoSelecionado.ObjetoAtualizar();
         }
       }
-
       if (estadoTeclado.IsKeyPressed(Keys.R) && objetoSelecionado != null)
       {
         //FIXME: Spline limpa os pontos da Spline, mas não limpa pontos e poliedro de controle 
