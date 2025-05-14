@@ -1,4 +1,4 @@
-﻿/*
+/*
  As constantes dos pré-processors estão nos arquivos ".csproj"
  desse projeto e da CG_Biblioteca.
 */
@@ -365,9 +365,11 @@ namespace gcgcg
         Console.WriteLine("Vector2 mousePosition (NDC): " + MousePosition);
         if (objetoSelecionado != null)
         {
-          sruPonto = objetoSelecionado.MatrizGlobalInversa(sruPonto);
+          // sruPonto = objetoSelecionado.MatrizGlobalInversa(sruPonto);
           Console.WriteLine("Vector2 mousePosition (Objeto): " + MousePosition);
         }
+        sruPonto = mundo.MatrizGlobalInversa(sruPonto);
+        mundo.ScanLine(sruPonto, ref objetoSelecionado);
       }
 
       #endregion
