@@ -1,1 +1,4 @@
 *.DS_Store
+/Unidade4/CG_N4/bin
+/Unidade4/CG_N4/obj
+/Unidade4/CG_N4/.vs

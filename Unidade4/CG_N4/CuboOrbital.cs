@@ -9,14 +9,14 @@ using System;
 
 namespace gcgcg
 {
-  internal class Cubo : Objeto
+  internal class CuboOrbital : Objeto
   {
     public Ponto4D[] vertices;
     int[] indices;
     // Vector3[] normals;
     // int[] colors;
 
-    public Cubo(Objeto _paiRef, ref char _rotulo) : base(_paiRef, ref _rotulo)
+    public CuboOrbital(Objeto _paiRef, ref char _rotulo) : base(_paiRef, ref _rotulo)
     {
       // PrimitivaTipo = PrimitiveType.TriangleFan;
       PrimitivaTipo = PrimitiveType.Triangles;
@@ -24,14 +24,14 @@ namespace gcgcg
 
       vertices = new Ponto4D[]
       {
-        new Ponto4D(-1.0f, -1.0f,  1.0f), // 0: Frente Inferior Esquerda
-        new Ponto4D( 1.0f, -1.0f,  1.0f), // 1: Frente Inferior Direita
-        new Ponto4D( 1.0f,  1.0f,  1.0f), // 2: Frente Superior Direita
-        new Ponto4D(-1.0f,  1.0f,  1.0f), // 3: Frente Superior Esquerda
-        new Ponto4D(-1.0f, -1.0f, -1.0f), // 4: Trás Inferior Esquerda
-        new Ponto4D( 1.0f, -1.0f, -1.0f), // 5: Trás Inferior Direita
-        new Ponto4D( 1.0f,  1.0f, -1.0f), // 6: Trás Superior Direita
-        new Ponto4D(-1.0f,  1.0f, -1.0f)  // 7: Trás Superior Esquerda
+        new Ponto4D(-0.6f, -0.6f,  0.6f), // 0: Frente Inferior Esquerda
+        new Ponto4D( 0.6f, -0.6f,  0.6f), // 1: Frente Inferior Direita
+        new Ponto4D( 0.6f,  0.6f,  0.6f), // 2: Frente Superior Direita
+        new Ponto4D(-0.6f,  0.6f,  0.6f), // 3: Frente Superior Esquerda
+        new Ponto4D(-0.6f, -0.6f, -0.6f), // 4: Trás Inferior Esquerda
+        new Ponto4D( 0.6f, -0.6f, -0.6f), // 5: Trás Inferior Direita
+        new Ponto4D( 0.6f,  0.6f, -0.6f), // 6: Trás Superior Direita
+        new Ponto4D(-0.6f,  0.6f, -0.6f)  // 7: Trás Superior Esquerda
       };
 
 
@@ -117,6 +117,7 @@ namespace gcgcg
         base.PontosAdicionar(vertices[indices[i]]); //usa os 36 pontos do vetor indices para montar cada triangulo
       }
 
+      this.MatrizTranslacaoXYZ(5, 0, 0);
 
       Atualizar();
     }
@@ -131,16 +132,11 @@ namespace gcgcg
     public override string ToString()
     {
       string retorno;
-      retorno = "__ Objeto Cubo _ Tipo: " + PrimitivaTipo + " _ Tamanho: " + PrimitivaTamanho + "\n";
+      retorno = "__ Objeto CuboOrbital _ Tipo: " + PrimitivaTipo + " _ Tamanho: " + PrimitivaTamanho + "\n";
       retorno += base.ImprimeToString();
       return (retorno);
     }
-
-        public static implicit operator Cubo(CuboOrbital v)
-        {
-            throw new NotImplementedException();
-        }
 #endif
 
-    }
+  }
 }

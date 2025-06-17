@@ -25,6 +25,8 @@ namespace gcgcg
     private char rotuloNovo = '?';
     private Objeto objetoSelecionado = null;
 
+    private Objeto objetoPonto = null;
+
 #if CG_Gizmo
     private readonly float[] _sruEixos =
     {
@@ -49,6 +51,23 @@ namespace gcgcg
     private Shader _shaderCiano;
     private Shader _shaderMagenta;
     private Shader _shaderAmarela;
+
+
+    private int _elementBufferObject;
+
+    private int _vertexBufferObject;
+
+    private int _vertexArrayObject;
+
+    private Shader _shader;
+
+    // For documentation on this, check Texture.cs.
+    private Texture _texture;
+
+    private CuboOrbital cuboOrbital;
+
+    private Cubo cubo;
+
 
     private Camera _camera;
 
@@ -100,15 +119,26 @@ namespace gcgcg
 #endif
 
       #region Objeto: ponto  
-      objetoSelecionado = new Ponto(mundo, ref rotuloNovo, new Ponto4D(2.0, 0.0));
+      /*objetoSelecionado = new Ponto(mundo, ref rotuloNovo, new Ponto4D(2.0, 0.0));
       objetoSelecionado.PrimitivaTipo = PrimitiveType.Points;
-      objetoSelecionado.PrimitivaTamanho = 5;
+      objetoSelecionado.PrimitivaTamanho = 5;*/
       #endregion
 
-      #region Objeto: Cubo
-      objetoSelecionado = new Cubo(mundo, ref rotuloNovo);
+       #region Objeto: Cubo
+      cubo = new Cubo(mundo, ref rotuloNovo);
+      objetoSelecionado = cubo;
       #endregion
       // objetoSelecionado.MatrizEscalaXYZ(0.2, 0.2, 0.2);
+
+      #region Cubo orbita
+      cuboOrbital = new CuboOrbital(mundo, ref rotuloNovo);
+      cuboOrbital.shaderCor = _shaderAzul;
+      objetoSelecionado = cuboOrbital;
+
+      #endregion
+
+
+     
 
       objetoSelecionado.shaderCor = _shaderAmarela;
 
@@ -137,6 +167,8 @@ namespace gcgcg
       SwapBuffers();
     }
 
+
+private double anguloOrbita = 0;
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
       base.OnUpdateFrame(e);
@@ -154,6 +186,10 @@ namespace gcgcg
         objetoSelecionado = mundo.GrafocenaBuscaProximo(objetoSelecionado);
         objetoSelecionado.shaderCor = _shaderAmarela;
       }
+
+      cuboOrbital.MatrizRotacaoEixo('z');
+      cuboOrbital.MatrizRotacao(0.075); 
+
       if (estadoTeclado.IsKeyPressed(Keys.G))
         mundo.GrafocenaImprimir("");
       if (estadoTeclado.IsKeyPressed(Keys.P) && objetoSelecionado != null)
@@ -239,6 +275,8 @@ namespace gcgcg
       }
 
       #endregion
+
+
 
     }
 
