@@ -26,8 +26,14 @@ namespace gcgcg
 
     // Vértices do objeto TODO: o objeto mundo deveria ter estes atributos abaixo?
     protected List<Ponto4D> pontosLista = new List<Ponto4D>();
+    protected List<Ponto4D> texturasLista = new List<Ponto4D>();
+    protected List<Ponto4D> normaisLista = new List<Ponto4D>();
+
     private int _vertexBufferObject;
     private int _vertexArrayObject;
+
+    private int _texturaBufferObject;
+    private int _normalBufferObject;
 
     // BBox do objeto
     private BBox bBox = new BBox();
@@ -83,17 +89,49 @@ namespace gcgcg
         ptoLista++;
       }
 
+      float[] vertTextura = new float[texturasLista.Count * 2];
+      var ptoTextura = 0;
+      for (int i = 0; i < vertTextura.Length; i += 2)
+      {
+        vertTextura[i] = (float)texturasLista[ptoTextura].X;
+        vertTextura[i + 1] = (float)texturasLista[ptoTextura].Y;
+        ptoTextura++;
+      }
+
+      float[] vertNormal = new float[normaisLista.Count * 3];
+      var ptoNormal = 0;
+      for (int i = 0; i < vertNormal.Length; i += 3)
+      {
+        vertNormal[i] = (float)normaisLista[ptoNormal].X;
+        vertNormal[i + 1] = (float)normaisLista[ptoNormal].Y;
+        vertNormal[i + 2] = (float)normaisLista[ptoNormal].Z;
+        ptoNormal++;
+      }
+
       GL.PointSize(primitivaTamanho);
 
       _vertexBufferObject = GL.GenBuffer();
       GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
       GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
+
       _vertexArrayObject = GL.GenVertexArray();
       GL.BindVertexArray(_vertexArrayObject);
       GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
       GL.EnableVertexAttribArray(0);
 
-      bBox.Atualizar(matriz,pontosLista);
+      _texturaBufferObject = GL.GenBuffer();
+      GL.BindBuffer(BufferTarget.ArrayBuffer, _texturaBufferObject);
+      GL.BufferData(BufferTarget.ArrayBuffer, vertTextura.Length * sizeof(float), vertTextura, BufferUsageHint.StaticDraw);
+      GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
+      GL.EnableVertexAttribArray(1);
+
+      _normalBufferObject = GL.GenBuffer();
+      GL.BindBuffer(BufferTarget.ArrayBuffer, _normalBufferObject);
+      GL.BufferData(BufferTarget.ArrayBuffer, vertNormal.Length * sizeof(float), vertNormal, BufferUsageHint.StaticDraw);
+      GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+      GL.EnableVertexAttribArray(2);
+
+      bBox.Atualizar(matriz, pontosLista);
 
     }
 
@@ -111,24 +149,36 @@ namespace gcgcg
 
         matrizGrafo = matrizGrafo.MultiplicarMatriz(matriz);
 
-        //// Atenção: manter a ordem da multiplicação das matrizes: "Model * View * Projeção". 
-        //// Model: matriz ModeltoWorld (também conhecida como modelo)
-        //// View: matriz WorldToView (também conhecida como visualização)
-        //// Projeção: matriz ViewTojectedSpace (também conhecida como projeção)
+        //// Atenção: manter a ordem da multiplicação das matrizes: "Model * View * Projeção".
         _shaderObjeto.SetMatrix4("model", matrizGrafo.ObterDadosOpenTK());
         _shaderObjeto.SetMatrix4("view", _camera.GetViewMatrix());
         _shaderObjeto.SetMatrix4("projection", _camera.GetProjectionMatrix());
 
         GL.DrawArrays(primitivaTipo, 0, pontosLista.Count);
 #elif CG_DirectX && !CG_OpenGL
-      Console.WriteLine(" .. Coloque aqui o seu código em DirectX");
+        Console.WriteLine(" .. Coloque aqui o seu código em DirectX");
 #elif (CG_DirectX && CG_OpenGL) || (!CG_DirectX && !CG_OpenGL)
-      Console.WriteLine(" .. ERRO de Render - escolha OpenGL ou DirectX !!");
+        Console.WriteLine(" .. ERRO de Render - escolha OpenGL ou DirectX !!");
 #endif
       }
+
+      // Loop recursivo para desenhar os filhos
       for (var i = 0; i < objetosLista.Count; i++)
       {
-        objetosLista[i].Desenhar(matrizGrafo, _camera);
+        var filho = objetosLista[i];
+
+        // --- INÍCIO DA MODIFICAÇÃO ---
+        // Aqui verificamos se o filho é uma face do cubo para ativar sua textura específica.
+        if (filho is CuboFaces face && face.TexturaDaFace != null)
+        {
+          // Ativa a unidade de textura 0 e vincula a textura específica daquela face.
+          GL.ActiveTexture(TextureUnit.Texture0);
+          GL.BindTexture(TextureTarget.Texture2D, face.TexturaDaFace.Handle);
+        }
+        // --- FIM DA MODIFICAÇÃO ---
+
+        // Desenha o filho. Se a textura foi vinculada no passo anterior, ela será usada aqui.
+        filho.Desenhar(matrizGrafo, _camera);
       }
     }
 

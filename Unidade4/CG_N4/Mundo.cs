@@ -12,7 +12,6 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Windowing.Desktop;
 using System;
 using OpenTK.Mathematics;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 //FIXME: padrão Singleton
@@ -36,7 +35,6 @@ namespace gcgcg
     private int _vertexBufferObject_sruEixos;
     private int _vertexArrayObject_sruEixos;
 
-
     // FPS
     private int frames = 0;
     private Stopwatch stopwatch = new();
@@ -51,6 +49,12 @@ namespace gcgcg
     private Shader _shaderAmarela;
 
     private Camera _camera;
+
+    private Cubo _cubo;
+    private CuboMenor _cuboMenor;
+
+    private bool _mouseNotPressed = true;
+    private Vector2 _lastMousePosition;
 
     public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
            : base(gameWindowSettings, nativeWindowSettings)
@@ -100,17 +104,20 @@ namespace gcgcg
 #endif
 
       #region Objeto: ponto  
-      objetoSelecionado = new Ponto(mundo, ref rotuloNovo, new Ponto4D(2.0, 0.0));
-      objetoSelecionado.PrimitivaTipo = PrimitiveType.Points;
-      objetoSelecionado.PrimitivaTamanho = 5;
+      // objetoSelecionado = new Ponto(mundo, ref rotuloNovo, new Ponto4D(2.0, 0.0));
+      // objetoSelecionado.PrimitivaTipo = PrimitiveType.Points;
+      // objetoSelecionado.PrimitivaTamanho = 5;
       #endregion
 
-      #region Objeto: Cubo
-      objetoSelecionado = new Cubo(mundo, ref rotuloNovo);
+      #region Objeto: Cubo Maior
+      _cubo = new Cubo(mundo, ref rotuloNovo);
+      objetoSelecionado = _cubo;
       #endregion
-      // objetoSelecionado.MatrizEscalaXYZ(0.2, 0.2, 0.2);
 
-      objetoSelecionado.shaderCor = _shaderAmarela;
+      #region Objeto: Cubo Menor
+      _cuboMenor = new CuboMenor(mundo, ref rotuloNovo);
+      objetoSelecionado = _cuboMenor;
+      #endregion
 
       _camera = new Camera(Vector3.UnitZ * 5, ClientSize.X / (float)ClientSize.Y);
     }
@@ -130,7 +137,7 @@ namespace gcgcg
       if (stopwatch.ElapsedMilliseconds >= 1000)
       {
         Console.WriteLine($"FPS: {frames}");
-        frames = 0; 
+        frames = 0;
         stopwatch.Restart();
       }
 #endif
@@ -192,6 +199,10 @@ namespace gcgcg
         objetoSelecionado.MatrizRotacaoZBBox(-10);
 
       const float cameraSpeed = 1.5f;
+      if (estadoTeclado.IsKeyDown(Keys.V))
+        _camera.Yaw += 25.0f * (float)e.Time; // Rotate right
+      if (estadoTeclado.IsKeyDown(Keys.N))
+        _camera.Yaw -= 25.0f * (float)e.Time; // Rotate left
       if (estadoTeclado.IsKeyDown(Keys.Z))
         _camera.Position = Vector3.UnitZ * 5;
       if (estadoTeclado.IsKeyDown(Keys.W))
@@ -206,17 +217,74 @@ namespace gcgcg
         _camera.Position += _camera.Up * cameraSpeed * (float)e.Time; // Up
       if (estadoTeclado.IsKeyDown(Keys.LeftShift))
         _camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
-      // if (estadoTeclado.IsKeyDown(Keys.D9))
-      //   _camera.Position += _camera.Up * cameraSpeed * (float)e.Time; // Up
-      // if (estadoTeclado.IsKeyDown(Keys.D0))
-      //   _camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
+                                                                      // if (estadoTeclado.IsKeyDown(Keys.D9))
+                                                                      //   _camera.Position += _camera.Up * cameraSpeed * (float)e.Time; // Up
+                                                                      // if (estadoTeclado.IsKeyDown(Keys.D0))
+                                                                      //   _camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
+
+      if (estadoTeclado.IsKeyPressed(Keys.KeyPad1))
+      {
+        BasicLightning();
+        Console.WriteLine("BasicLighting");
+      }
+      if (estadoTeclado.IsKeyPressed(Keys.KeyPad2))
+      {
+        LightningMap();
+        Console.WriteLine("LightingMaps");
+      }
+      if (estadoTeclado.IsKeyPressed(Keys.KeyPad3))
+      {
+        DirectionalLights();
+        Console.WriteLine("LightCasters-DirectionalLights");
+      }
+      if (estadoTeclado.IsKeyPressed(Keys.KeyPad4))
+      {
+        PointLights();
+        Console.WriteLine("LightCasters-PointLights");
+      }
+      if (estadoTeclado.IsKeyPressed(Keys.KeyPad5))
+      {
+        Spotlight();
+        Console.WriteLine("LightCasters-Spotlight");
+      }
+      if (estadoTeclado.IsKeyPressed(Keys.KeyPad6))
+      {
+        MultipleLights();
+        Console.WriteLine("MultipleLights");
+      }
+      if (estadoTeclado.IsKeyPressed(Keys.KeyPad0))
+      {
+        Nothing();
+        Console.WriteLine("Sem iluminação");
+      }
 
       #endregion
 
       #region  Mouse
 
+      var estadoMouse = MouseState;
+
+      // Move ou não a camera (Todas as direções)
+      if (_mouseNotPressed)
+      {
+        _lastMousePosition = new Vector2(estadoMouse.X, estadoMouse.Y);
+      }
+      else
+      {
+        float dX = estadoMouse.X - _lastMousePosition.X;
+        float dY = estadoMouse.Y - _lastMousePosition.Y;
+
+        _lastMousePosition = new Vector2(estadoMouse.X, estadoMouse.Y);
+
+        _camera.Yaw += dX * 0.1f;
+        _camera.Pitch -= dY * 0.1f;
+      }
+
       if (MouseState.IsButtonPressed(MouseButton.Left))
       {
+        // Desativa ou ativa movimento da camera com o mouse
+        _mouseNotPressed = !_mouseNotPressed;
+
         Console.WriteLine("MouseState.IsButtonPressed(MouseButton.Left)");
         Console.WriteLine("__ Valores do Espaço de Tela");
         Console.WriteLine("Vector2 mousePosition: " + MousePosition);
@@ -240,6 +308,48 @@ namespace gcgcg
 
       #endregion
 
+      _cuboMenor.TrocaEixoRotacao('z');
+      _cuboMenor.MatrizRotacao(0.075);
+    }
+
+    private void Nothing()
+    {
+      throw new NotImplementedException();
+    }
+
+
+    private void MultipleLights()
+    {
+      throw new NotImplementedException();
+    }
+
+
+    private void Spotlight()
+    {
+      throw new NotImplementedException();
+    }
+
+
+    private void PointLights()
+    {
+      throw new NotImplementedException();
+    }
+
+
+    private void DirectionalLights()
+    {
+      throw new NotImplementedException();
+    }
+
+
+    private void LightningMap()
+    {
+      throw new NotImplementedException();
+    }
+
+    private void BasicLightning()
+    {
+      throw new NotImplementedException();
     }
 
     protected override void OnResize(ResizeEventArgs e)
