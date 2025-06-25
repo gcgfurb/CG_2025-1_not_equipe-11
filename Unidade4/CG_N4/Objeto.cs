@@ -110,29 +110,32 @@ namespace gcgcg
 
       GL.PointSize(primitivaTamanho);
 
-      _vertexBufferObject = GL.GenBuffer();
+      if (_vertexArrayObject == 0)
+      {
+        _vertexArrayObject = GL.GenVertexArray();
+        _vertexBufferObject = GL.GenBuffer();
+        _texturaBufferObject = GL.GenBuffer();
+        _normalBufferObject = GL.GenBuffer();
+      }
+
       GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
       GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
 
-      _vertexArrayObject = GL.GenVertexArray();
       GL.BindVertexArray(_vertexArrayObject);
       GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
       GL.EnableVertexAttribArray(0);
 
-      _texturaBufferObject = GL.GenBuffer();
       GL.BindBuffer(BufferTarget.ArrayBuffer, _texturaBufferObject);
       GL.BufferData(BufferTarget.ArrayBuffer, vertTextura.Length * sizeof(float), vertTextura, BufferUsageHint.StaticDraw);
       GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
       GL.EnableVertexAttribArray(1);
 
-      _normalBufferObject = GL.GenBuffer();
       GL.BindBuffer(BufferTarget.ArrayBuffer, _normalBufferObject);
       GL.BufferData(BufferTarget.ArrayBuffer, vertNormal.Length * sizeof(float), vertNormal, BufferUsageHint.StaticDraw);
       GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
       GL.EnableVertexAttribArray(2);
 
       bBox.Atualizar(matriz, pontosLista);
-
     }
 
     // FIXME: quando Classe mundo for Singleton não precisa passar _camera pois posso pegar ponteiro do mundo.
